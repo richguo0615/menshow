@@ -1,0 +1,45 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: dev-cluster
+  region: ap-northeast-1
+  version: '1.21'
+
+nodeGroups:
+  - name: eks-ng-1-21
+    instanceType: t3.small
+    desiredCapacity: 1
+    volumeSize: 80 # GB
+    ssh:
+      allow: true # will use ~/.ssh/id_rsa.pub as the default ssh key
+      publicKeyName: 'menshow'
+    maxPodsPerNode: 110
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+    kubeletExtraConfig:
+        kubeReserved:
+            cpu: "300m"
+            memory: "300Mi"
+            ephemeral-storage: "1Gi"
+        kubeReservedCgroup: "/kube-reserved"
+        systemReserved:
+            cpu: "300m"
+            memory: "300Mi"
+            ephemeral-storage: "1Gi"
+        evictionSoft:
+            memory.available:  "20%"
+            nodefs.available: "20%"
+            imagefs.available: "20%"
+        evictionSoftGracePeriod:
+          memory.available: "2m"
+          nodefs.available: "2m"
+          imagefs.available: "2m"
+        evictionHard:
+            memory.available:  "10%"
+            nodefs.available: "15%"
+            imagefs.available: "15%"
+
+iam:
+  withOIDC: true
